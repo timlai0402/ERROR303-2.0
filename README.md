@@ -20,7 +20,7 @@
 | Resource          | Link                                                                 |
 | ----------------- | -------------------------------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR303-2.0                           |
-| Live Demo         |                                       |
+| Live Demo         |  [https://error303v2.vercel.app/]   (<https://error303v2.vercel.app/>)                                  |
 | Slide Deck        | [SDC2026_ERROR 303_Final Pitch Slide.pdf](<submission/SDC2026_ERROR 303_Final Pitch Slide.pdf>) |
 
 
