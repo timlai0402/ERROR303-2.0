@@ -359,3 +359,6 @@ button.row:hover, a.row:hover { background: var(--surface-2); }
 @media (min-width: 900px) { .hide-sm { display: initial; } .hide-lg { display: none; } }
 .chart-box { height: 240px; padding: 8px 8px 0 0; }
 .alert-row .row-title { white-space: normal; }
+/* keep cards inside narrow screens */
+.two-col > *, .grid-actions > *, .kpis > * { min-width: 0; }
+.stepper input, .input-row .input { width: 100%; }
