@@ -20,10 +20,10 @@
 | Resource          | Link                                                                 |
 | ----------------- | -------------------------------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR303-2.0                           |
-| Live Demo         | https://stock-wise.replit.app                                        |
+| Live Demo         |                                       |
 | Slide Deck        | [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
-| Demo Video        | [https://youtu.be/QjNjUeEtulU](https://youtu.be/QjNjUeEtulU)         |
-| Pitch Video       | [https://youtu.be/PdYZQNNhst0](https://youtu.be/PdYZQNNhst0)         |
+
+
 
 ---
 
