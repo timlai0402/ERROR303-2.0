@@ -36,6 +36,19 @@ npm start
 
 Demo accounts: Aisyah (Owner), Daniel and Priya (Staff). Demo codes for scanning: `SW-1001` to `SW-1021`. Reset sample data anytime from **Account → Reset demo data**.
 
+## Shared database (Supabase)
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. In the dashboard open **SQL Editor → New query**, paste `supabase/schema.sql`, and click **Run**.
+3. From **Project Settings → API**, copy the Project URL and the `anon` public key into `.env`:
+   ```
+   VITE_SUPABASE_URL=https://xxxx.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJ...
+   ```
+4. Restart `npm run dev`. On first run the demo data is uploaded automatically. **Account → Database** shows "Supabase connected", and changes sync live across every device.
+
+Leave these blank to keep data in the browser only. The schema's open access policies are for the hackathon demo; switch to Supabase Auth policies before real use.
+
 ## Push to GitHub
 
 ```bash
@@ -51,7 +64,9 @@ git push -u origin main
 ```
 server/index.js          Express API — proxies delivery-note photos to Claude (vision)
 src/lib/inventory.js     FIFO allocation, forecasting, product matching
-src/lib/store.jsx        App state (saved in browser localStorage)
+src/lib/store.jsx        App state (Supabase when configured, otherwise browser storage)
+src/lib/db.js            Supabase load, save and live sync
+supabase/schema.sql      Database tables, policies and realtime setup
 src/data/seed.js         Realistic demo data, generated relative to today
 src/data/sampleNotes.js  Demo-mode results for the sample delivery notes
 src/pages/               Home, Stock In/Out, New Product, Snap, History, Inventory, Statistics, Account
@@ -61,6 +76,5 @@ src/components/          Layout, scanner, reorder modal, shared UI
 Tech: React 18, Vite, React Router, Recharts, lucide-react icons, html5-qrcode, Express.
 
 ## Next steps after the hackathon
-- Move data from localStorage to a database (e.g. Supabase / PostgreSQL) for multi-device sync.
 - Real authentication and per-role permissions.
 - Printable QR label sheets for new products.
