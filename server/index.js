@@ -71,7 +71,7 @@ app.post('/api/extract-delivery-note', async (req, res) => {
 });
 
 // Serve the built web app in production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' || process.argv.includes('--prod')) {
   const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
   app.use(express.static(dist));
   app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')));
