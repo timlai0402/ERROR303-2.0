@@ -21,7 +21,7 @@
 | ----------------- | -------------------------------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR303-2.0                           |
 | Live Demo         |                                       |
-| Slide Deck        | [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
+| Slide Deck        | [SDC2026_ERROR 303_Final Pitch Slide.pdf](<submission/SDC2026_ERROR 303_Final Pitch Slide.pdf>) |
 
 
 
