@@ -26,7 +26,7 @@ function SupplierModal({ supplier, onClose }) {
 }
 
 export default function Account() {
-  const { user, users, login, logout, business, setBusiness, suppliers, resetDemo, toast } = useStore();
+  const { user, users, login, logout, business, setBusiness, suppliers, resetDemo, toast, dbEnabled } = useStore();
   const [sup, setSup] = useState(null);
   const [ai, setAi] = useState(null);
 
@@ -94,7 +94,14 @@ export default function Account() {
             )}
           </div>
 
-          <button className="btn danger block mt-16" onClick={() => { if (confirm('Reset all data back to the demo sample?')) { resetDemo(); toast('Demo data restored'); } }}>
+          <div className="section-title"><h2>Database</h2></div>
+          <div className="card card-pad small">
+            {dbEnabled
+              ? <><span className="badge green">Supabase connected</span> <span className="muted">Changes sync live across all devices.</span></>
+              : <><span className="badge amber">This browser only</span> <span className="muted">Add Supabase keys to .env to share data across devices.</span></>}
+          </div>
+
+          <button className="btn danger block mt-16" onClick={async () => { if (confirm(dbEnabled ? 'Reset ALL data in the shared database back to the demo sample?' : 'Reset all data back to the demo sample?')) { try { await resetDemo(); toast('Demo data restored'); } catch (e) { toast(e.message, 'error'); } } }}>
             <RotateCcw size={16} /> Reset demo data
           </button>
         </div>

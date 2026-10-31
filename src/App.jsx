@@ -16,7 +16,20 @@ import Alerts from './pages/Alerts.jsx';
 import SnapNote from './pages/SnapNote.jsx';
 
 export default function App() {
-  const { user } = useStore();
+  const { user, dbStatus, dbError } = useStore();
+  if (dbStatus === 'loading') {
+    return <div className="login"><div className="card login-card" style={{ textAlign: 'center' }}><b>Connecting to database…</b><div className="small muted mt-8">Loading your stock from Supabase</div></div></div>;
+  }
+  if (dbStatus === 'error') {
+    return (
+      <div className="login"><div className="card login-card">
+        <h1 style={{ fontSize: 19 }}>Can't reach the database</h1>
+        <p className="small muted mt-8">{dbError}</p>
+        <p className="small mt-12">Check that <b>supabase/schema.sql</b> has been run in your Supabase project, and that VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env are correct. Then restart <code>npm run dev</code>.</p>
+        <button className="btn primary block mt-16" onClick={() => location.reload()}>Try again</button>
+      </div></div>
+    );
+  }
   if (!user) return <><Login /><Toasts /></>;
   return (
     <HashRouter>
