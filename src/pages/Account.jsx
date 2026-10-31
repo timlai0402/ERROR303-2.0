@@ -90,7 +90,7 @@ export default function Account() {
             {ai == null ? 'Checking…' : ai.ok && ai.ai ? (
               <><span className="badge green">Live AI</span> <span className="muted">Delivery notes are read by {ai.model}.</span></>
             ) : (
-              <><span className="badge amber">Demo mode</span> <span className="muted">Using built-in sample delivery notes. Add ANTHROPIC_API_KEY to the server's .env to read real photos.</span></>
+              <><span className="badge amber">Demo mode</span> <span className="muted">Using built-in sample delivery notes. Add AI_API_KEY to the server's .env to read real photos.</span></>
             )}
           </div>
 

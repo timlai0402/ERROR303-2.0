@@ -8,8 +8,11 @@ const app = express();
 app.use(express.json({ limit: '15mb' }));
 
 const PORT = process.env.PORT || 3001;
-const KEY = process.env.ANTHROPIC_API_KEY;
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5';
+// Works with Anthropic directly, or any OpenAI-compatible provider (most third-party AI APIs).
+const KEY = process.env.AI_API_KEY || process.env.ANTHROPIC_API_KEY;
+const FORMAT = (process.env.AI_FORMAT || (KEY?.startsWith('sk-ant-') ? 'anthropic' : 'openai')).toLowerCase();
+const BASE_URL = (process.env.AI_BASE_URL || (FORMAT === 'anthropic' ? 'https://api.anthropic.com/v1' : 'https://api.openai.com/v1')).replace(/\/+$/, '');
+const MODEL = process.env.AI_MODEL || process.env.ANTHROPIC_MODEL || (FORMAT === 'anthropic' ? 'claude-sonnet-5-5' : 'gpt-4o-mini');
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, ai: Boolean(KEY), model: KEY ? MODEL : null });
@@ -33,6 +36,45 @@ Respond with ONLY valid JSON, no markdown, in this exact shape:
 }
 "confidence" is 0 to 1 for the match (0 if matchProductId is null). Ignore totals, taxes, prices and signatures.`;
 
+async function askVision({ mediaType, base64, prompt }) {
+  let r;
+  if (FORMAT === 'anthropic') {
+    r = await fetch(`${BASE_URL}/messages`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+          { type: 'text', text: prompt },
+        ] }],
+      }),
+    });
+  } else {
+    r = await fetch(`${BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64}` } },
+          { type: 'text', text: prompt },
+        ] }],
+      }),
+    });
+  }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = data?.error?.message || data?.message || `AI provider returned ${r.status}`;
+    throw Object.assign(new Error(msg), { status: 502 });
+  }
+  return FORMAT === 'anthropic'
+    ? (data.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('')
+    : data.choices?.[0]?.message?.content || '';
+}
+
 app.post('/api/extract-delivery-note', async (req, res) => {
   if (!KEY) return res.status(503).json({ error: 'AI key not configured', demo: true });
   const { image, products = [] } = req.body || {};
@@ -40,32 +82,12 @@ app.post('/api/extract-delivery-note', async (req, res) => {
   if (!m) return res.status(400).json({ error: 'Send the photo as a base64 data URL in "image".' });
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 2000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
-            { type: 'text', text: PROMPT(products) },
-          ],
-        }],
-      }),
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(502).json({ error: data?.error?.message || 'AI request failed' });
-    const text = (data.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('');
+    const text = await askVision({ mediaType: m[1], base64: m[2], prompt: PROMPT(products) });
     const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
     res.json({ ...json, model: MODEL });
   } catch (e) {
-    console.error(e);
+    console.error('[AI]', e.message);
+    if (e.status === 502) return res.status(502).json({ error: e.message });
     res.status(500).json({ error: 'Could not read this document. Try a clearer, well-lit photo.' });
   }
 });
@@ -78,5 +100,5 @@ if (process.env.NODE_ENV === 'production' || process.argv.includes('--prod')) {
 }
 
 app.listen(PORT, () => {
-  console.log(`StockWise API on http://localhost:${PORT}  (${KEY ? `AI: ${MODEL}` : 'Demo mode — no AI key'})`);
+  console.log(`StockWise API on http://localhost:${PORT}  (${KEY ? `AI: ${MODEL} via ${BASE_URL}` : 'Demo mode — no AI key'})`);
 });

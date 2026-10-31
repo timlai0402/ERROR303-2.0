@@ -20,7 +20,7 @@ Requires Node.js 18+.
 
 ```bash
 npm install
-cp .env.example .env      # optional: add ANTHROPIC_API_KEY for live AI reading
+cp .env.example .env      # optional: add your AI key for live delivery-note reading
 npm run dev               # web on http://localhost:5173, API on :3001
 ```
 
@@ -29,6 +29,8 @@ Production (single server on port 3001):
 ```bash
 npm start
 ```
+
+**AI key:** in `.env` set `AI_API_KEY`, plus `AI_BASE_URL` and `AI_MODEL` from your provider (any OpenAI-compatible API, or Anthropic). The model must support images. Restart `npm run dev` after editing.
 
 **Demo Mode:** without an API key the app still works end to end. The three sample delivery notes (in `public/samples/`) use pre-extracted results, so the Snap feature can be demoed live. Add a key to read real photos.
 
